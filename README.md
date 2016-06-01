@@ -17,7 +17,7 @@ Note:
 
     Debuging:Esp-(GPIO0) -> GND
     Run standalone: Esp-(GPIO0) remove out GND
-    To re-upload code to ESP, un-plug then re-plug GPIO0
+    To re-upload code to ESP, un-plug then re-plug GPIO0, VCC
     GPIO4: 5, GPIO5: 4 (they are label incorrectly)
     Enable deepSleep mode: connect GPIO16 & RST
 
