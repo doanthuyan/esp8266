@@ -2,13 +2,13 @@
 #define _PROPERTIES_H
 
 
-const uint8_t wsIP[] = {192,168,48,20};
+const uint8_t wsIP[] = {};
 
 #define updateInterval  30 * 1000      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
 #define serverPort 80
 
-#define WIFI_SSID       "IoT"           // cannot be longer than 32 characters!
-#define WIFI_PASS       "IoT@AAVN"
+#define WIFI_SSID       ""           // cannot be longer than 32 characters!
+#define WIFI_PASS       ""
 
 #define SEND_INTERVAL 15*60*1000
 
