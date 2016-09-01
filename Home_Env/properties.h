@@ -9,8 +9,8 @@
 #define updateInterval  30 * 1000      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
 #define serverPort 80
 
-#define WIFI_SSID       "anonymous"           // cannot be longer than 32 characters!
-#define WIFI_PASS       "anhtu4x4"
+#define WIFI_SSID       ""           // cannot be longer than 32 characters!
+#define WIFI_PASS       ""
 
 #define SEND_INTERVAL 15*60*1000
 
