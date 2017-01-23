@@ -1,7 +1,9 @@
 #include "wifiUtil.h"
 #include "properties.h"
 #include <ESP8266WiFi.h>
-
+#include <ArduinoJson.h>
+#include "dataReader.h"
+WiFiClient client;
 void pushData(){
   // Attempt to connect to website
   Serial.println("\nAttempt to connect to website");
@@ -63,6 +65,122 @@ bool updateThingSpeak(const char * data)
   client.println("Connection: close");
   client.println();
 
+  return true;
+
+}
+void getAqiData(){
+  Serial.println("\nAttempt to connect to website");
+  String response  = "";
+  Serial.println("\nAttempt to read data from AQICN");
+  if ( !client.connect(aqiAddress, serverPort) ) {
+    Serial.println("Cannot connect AQI data");
+    return;
+  }
+  
+  // Make an HTTP GET request
+  client.print("GET /feed/");
+  client.print(aqiStationId);
+  client.print("/?token=");
+  client.print(aqiToken);
+  client.println(" HTTP/1.1");
+  client.print("Host: ");
+  client.println(aqiAddress);
+  client.println("Connection: close");
+  client.println();
+
+  
+
+  delay (5000);
+  // If there are incoming bytes, print them
+  //String response = "";
+  while ( client.available() ) {
+    char c = client.read();
+    response.concat(c);
+    Serial.print(c);
+  }
+  Serial.println();
+  int index = response.indexOf('{');
+  response = response.substring(index);
+  response.replace ("\\","");
+  Serial.println("Received data:" );
+  Serial.println(response);
+  char dataStr[1000];
+  strcpy(dataStr, response.c_str());
+  StaticJsonBuffer<1200> jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(dataStr);
+  if (!root.success()) {
+    Serial.println("parseObject() failed");
+    return;
+  }
+  JsonObject& obj1 = root["data"];
+  env.aqi = obj1["aqi"];
+  //Serial.println(data);
+
+  Serial.print("Received data:" );
+  Serial.println(response);
+  Serial.print("AQI: ");
+  Serial.println(env.aqi);
+
+}
+bool updateAAVN()
+{
+  WiFiClient client;
+  // Attempt to make a connection to the remote server
+  Serial.println("\nAttempt to make a connection to the remote server");
+  if ( !client.connect(snifferAddress, serverPort) ) {
+    Serial.println("connection failed");
+    return false;
+  }
+  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.println("REQUEST: \n" );
+  // We now create a URI for the request
+  //String url = "/sniffer-admin/api/packet";
+  //String postData = "{\"source\": {\"senderCode\": \"143253\",\"netAddress\": \"192.168.1.1\"},\"data\": [{\"symbolCode\": \"O3\",\"value\": 4.1}, {\"symbolCode\": \"PM2.5\",\"value\": 55}]}";
+  char data[500];
+  formatAAVNData(data);
+  Serial.print("Data: ");
+  Serial.println(data);
+  
+  Serial.print("\n\nRequesting URL: ");
+  Serial.println(snifferUrl);
+  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.print("POST ");
+  Serial.print(snifferUrl);
+  Serial.println(" HTTP/1.0");
+  Serial.print("Host: ");
+  Serial.println(snifferAddress);
+  Serial.println("Accept: */*");
+  Serial.println("Cache-Control: no-cache");
+  Serial.println("Content-Type: application/json");
+  Serial.print("Content-Length: ");
+  Serial.println(strlen(data));
+  Serial.println();
+  Serial.println(data);
+  // This will send the request to the server
+  client.print("POST ");
+  client.print(snifferUrl);
+  client.println(" HTTP/1.0");
+  client.print("Host: ");
+  client.println(snifferAddress);
+  client.println("Accept: */*");
+  client.println("Cache-Control: no-cache");
+  client.println("Content-Type: application/json");
+  client.print("Content-Length: ");
+  client.println(strlen(data));
+  client.println();
+  client.println(data);
+  //client.println("Connection: close");
+  //client.println();
+  delay(100);
+   delay (5000);
+  // If there are incoming bytes, print them
+  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.println("REQUEST: \n" );
+
+  while ( client.available() ) {
+    char c = client.read();
+    Serial.print(c);
+  }
   return true;
 
 }

@@ -3,4 +3,5 @@
 
 void displayData();
 void initDisplay();
+int getAqiIndex();
 #endif

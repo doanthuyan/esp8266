@@ -7,15 +7,17 @@
 #include "wifiUtil.h"
 #include "dataReader.h"
 #include "displayUtil.h"
+#include <ArduinoJson.h>
 
 DHT dht(DHTPIN, DHTTYPE);
 LiquidCrystal_I2C lcd(0x3f,16,2);  // set the LCD address to 0x3f for a 16 chars and 2 line display
 // Global variables
-WiFiClient client;
+
 Environment env;
 
 
 void setup() {
+  
   initDisplay();
 
   // Set up serial console to read web page
@@ -34,7 +36,7 @@ void setup() {
 }
 
 void loop() {
-  
+  getAqiData();
   pushData();
   displayData();
   
