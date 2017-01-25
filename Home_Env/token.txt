@@ -1,1 +1,4 @@
 aqicnToken: d529395274dba5229ec9b822098f340a658b2a75
+
+sniffer-mind sender: ATHPZr34uk
+sniffer-mind-it sender: oLHLDtpBxS, yhlrpJwCIm

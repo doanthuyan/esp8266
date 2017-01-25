@@ -7,22 +7,20 @@ WiFiClient client;
 void pushData(){
   // Attempt to connect to website
   Serial.println("\nAttempt to connect to website");
-  char data[50];
-  int n = readData(data);//sprintf(data,"%s","&field1=1&field2=3&field3=2");
   //data = "&field1=10";
-  if(n <= 0){
+  
+  if(!readData()){
     Serial.println("\n*** Error reading sensor ***");
     return;
   }
-  if ( !updateThingSpeak(data) ) {
+  if ( !updateThingSpeak() ) {
     Serial.println("GET request failed");
   }
-  delay (5000);
-  // If there are incoming bytes, print them
-  while ( client.available() ) {
-    char c = client.read();
-    Serial.print(c);
+  
+  if ( !updateAAVN() ) {
+    Serial.println("POST request failed");
   }
+  
 }
 // Attempt to connect to WiFi
 void connectWiFi() {
@@ -47,8 +45,12 @@ void connectWiFi() {
   digitalWrite(WIFI_ERR_PIN, LOW);
 }
 
-bool updateThingSpeak(const char * data)
+bool updateThingSpeak()
 {
+    char data[100];
+  //int n = readData(data);//sprintf(data,"%s","&field1=1&field2=3&field3=2");
+  formatThingspeakData(data);
+
   // Attempt to make a connection to the remote server
   Serial.println("\nAttempt to make a connection to the remote server");
   if ( !client.connect(thingSpeakAddress, serverPort) ) {
@@ -56,6 +58,16 @@ bool updateThingSpeak(const char * data)
   }
   
   // Make an HTTP GET request
+  //debug
+  Serial.print("GET /update?key=");
+  Serial.print(writeAPIKey);
+  Serial.print(data);
+  Serial.println(" HTTP/1.1");
+  Serial.print("Host: ");
+  Serial.println(thingSpeakAddress);
+  Serial.println("Connection: close");
+  Serial.println();
+  //
   client.print("GET /update?key=");
   client.print(writeAPIKey);
   client.print(data);
@@ -64,7 +76,16 @@ bool updateThingSpeak(const char * data)
   client.println(thingSpeakAddress);
   client.println("Connection: close");
   client.println();
+  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.println("RESponse: \n" );
 
+  delay (5000);
+  // If there are incoming bytes, print them
+  while ( client.available() ) {
+    char c = client.read();
+    Serial.print(c);
+  }
+  Serial.println("\n---------------------------------------------------------------------\n");
   return true;
 
 }
@@ -131,7 +152,7 @@ bool updateAAVN()
     Serial.println("connection failed");
     return false;
   }
-  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.println("\n---------------------------------------------------------------------\n");
   Serial.println("REQUEST: \n" );
   // We now create a URI for the request
   //String url = "/sniffer-admin/api/packet";
@@ -143,7 +164,7 @@ bool updateAAVN()
   
   Serial.print("\n\nRequesting URL: ");
   Serial.println(snifferUrl);
-  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.println("\n---------------------------------------------------------------------\n");
   Serial.print("POST ");
   Serial.print(snifferUrl);
   Serial.println(" HTTP/1.0");
@@ -174,13 +195,14 @@ bool updateAAVN()
   delay(100);
    delay (5000);
   // If there are incoming bytes, print them
-  Serial.println("\n\n---------------------------------------------------------------------\n");
-  Serial.println("REQUEST: \n" );
+  Serial.println("\n---------------------------------------------------------------------\n");
+  Serial.println("RESponse: \n" );
 
   while ( client.available() ) {
     char c = client.read();
     Serial.print(c);
   }
+  Serial.println("\n---------------------------------------------------------------------\n");
   return true;
 
 }

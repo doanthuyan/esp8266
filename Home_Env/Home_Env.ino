@@ -10,7 +10,7 @@
 #include <ArduinoJson.h>
 
 DHT dht(DHTPIN, DHTTYPE);
-LiquidCrystal_I2C lcd(0x3f,16,2);  // set the LCD address to 0x3f for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x3f for a 16 chars and 2 line display
 // Global variables
 
 Environment env;
@@ -18,12 +18,12 @@ Environment env;
 
 void setup() {
   
-  initDisplay();
+  
 
   // Set up serial console to read web page
   Serial.begin(115200);
   Serial.println("Environment monitor");
-  
+  initDisplay();
   // Set up LED for debugging
   pinMode(WIFI_ERR_PIN, OUTPUT);
 
@@ -38,13 +38,18 @@ void setup() {
 void loop() {
   getAqiData();
   pushData();
+  env.heatIndex = 25;
+  env.temperature = 28;
+  env.humidity = 40;
+  env.aqi = 140;
   displayData();
+
+  delay (500);
   
-  
-  bailout:Serial.println("Terminate loop");
+  //bailout:Serial.println("Terminate loop");
   // go to deepsleep for 10 minutes
   delay(15*60*1000);
-
+  
 }
 
 

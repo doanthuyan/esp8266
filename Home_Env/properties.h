@@ -33,8 +33,8 @@
 #define aqiStationId "@8767"
 
 #define snifferAddress "iot.axonactive.vn"
-#define snifferUrl "/sniffer-mind/api/pollutantvalues"
-#define sender "oLHLDtpBxS"
+#define snifferUrl "/sniffer-mind-it/api/pollutantvalues"
+#define sender "yhlrpJwCIm"
 
 #define gps "10.831233, 106.635495"
 
@@ -46,11 +46,11 @@
 
 #define SEND_INTERVAL 15*60*1000
 
-#define DHTPIN 13     // what pin we're connected to
+#define DHTPIN 16     // what pin we're connected to
 
 // Uncomment whatever type you're using!
-//#define DHTTYPE DHT11   // DHT 11
-#define DHTTYPE DHT22   // DHT 22  (AM2302)
+#define DHTTYPE DHT11   // DHT 11
+//#define DHTTYPE DHT22   // DHT 22  (AM2302)
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
 #define WIFI_ERR_PIN 12
@@ -67,8 +67,8 @@ extern LiquidCrystal_I2C lcd;
 extern WiFiClient client;
 extern Environment env;
 
-int readData(char * data);
-bool updateThingSpeak(const char * data);
+//int readData(char * data);
+//bool updateThingSpeak(const char * data);
 const char AQI_LEVEL[6][9] = {"Good","Moderate", "Alert","Bad","VeryBad","Poison"};
 
 #endif

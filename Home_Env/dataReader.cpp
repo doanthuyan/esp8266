@@ -4,10 +4,10 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 
-int readData(char * data){
+bool readData(){
   
   // DISPLAY DATA
-  char humStr[8];
+  /*char humStr[8];
   char temStr[8];
   char hIndexStr[8];
   /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
@@ -22,7 +22,7 @@ int readData(char * data){
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t) ) {
     Serial.println("Failed to read from DHT sensor!");
-    return 0;
+    return false;
   }
   delay(200);
   // Compute heat index in Celsius (isFahreheit = false)
@@ -42,7 +42,7 @@ int readData(char * data){
   Serial.print(hic);
   Serial.print(" *C ");
 
-  dtostrf(h, 4, 2, humStr);
+  /*dtostrf(h, 4, 2, humStr);
   dtostrf(t, 4, 2, temStr);
   dtostrf(hic, 4, 2, hIndexStr);
 
@@ -51,6 +51,8 @@ int readData(char * data){
   
   int n = sprintf(data,"&field1=%s&field2=%s&field3=%s",humStr,temStr,hIndexStr);
   return n;
+  */
+  return true;
 }
 void formatAAVNData(char * dataStr){
   StaticJsonBuffer<300> jsonBuffer;
@@ -61,12 +63,12 @@ void formatAAVNData(char * dataStr){
   source[SOURCE_ID_KEY] = sender;
   String macStr = WiFi.macAddress();
   macStr.replace(":","-");
-  source[MAC_KEY] = WiFi.macAddress();
+  source[MAC_KEY] = macStr;
   source[GPS_KEY] = gps;
 
   JsonArray& data = root.createNestedArray(VALS_KEY);
   
-  StaticJsonBuffer<100> buffer1;
+  StaticJsonBuffer<150> buffer1;
   JsonObject& obj1 = buffer1.createObject();
   
   obj1[CODE_KEY] = HUM_KEY;
@@ -74,7 +76,7 @@ void formatAAVNData(char * dataStr){
   JsonObject& val1 = obj1.createNestedObject(VAL_KEY);
   val1[VAL_KEY] = env.humidity;
 
-  StaticJsonBuffer<100> buffer2;
+  StaticJsonBuffer<150> buffer2;
   JsonObject& obj2 = buffer2.createObject();
   obj2[CODE_KEY] = TEMP_KEY;
   obj2[SENSOR_KEY] = TEMP_SENSOR;
