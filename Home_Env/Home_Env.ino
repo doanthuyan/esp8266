@@ -38,10 +38,6 @@ void setup() {
 void loop() {
   getAqiData();
   pushData();
-  env.heatIndex = 25;
-  env.temperature = 28;
-  env.humidity = 40;
-  env.aqi = 140;
   displayData();
 
   delay (500);

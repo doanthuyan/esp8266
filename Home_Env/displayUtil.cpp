@@ -36,18 +36,20 @@ void displayData(){
 }
 int getAqiIndex(){
   int index = 0;
-  if(env.aqi<= 50){
+  if(env.aqi == 0){
     index = 0;
-  }else if(env.aqi <= 100){
+  }else if(env.aqi<= 50){
     index = 1;
-  }else if(env.aqi <= 150){
+  }else if(env.aqi <= 100){
     index = 2;
-  }else if(env.aqi <= 200){
+  }else if(env.aqi <= 150){
     index = 3;
-  }else if(env.aqi <= 300){
+  }else if(env.aqi <= 200){
     index = 4;
-  }else{
+  }else if(env.aqi <= 300){
     index = 5;
+  }else{
+    index = 6;
   }
   return index;
 }

@@ -1,3 +1,4 @@
+
 #ifndef _PROPERTIES_H
 #define _PROPERTIES_H
 #include <LiquidCrystal_I2C.h>
@@ -41,16 +42,16 @@
 #define TEMP_SENSOR "DHT11"
 
 
-#define WIFI_SSID       "IoT"           // cannot be longer than 32 characters!
-#define WIFI_PASS       "IoT@AAVN"
+#define WIFI_SSID       ""           // cannot be longer than 32 characters!
+#define WIFI_PASS       ""
 
 #define SEND_INTERVAL 15*60*1000
 
 #define DHTPIN 16     // what pin we're connected to
 
 // Uncomment whatever type you're using!
-#define DHTTYPE DHT11   // DHT 11
-//#define DHTTYPE DHT22   // DHT 22  (AM2302)
+//#define DHTTYPE DHT11   // DHT 11
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
 #define WIFI_ERR_PIN 12
@@ -69,6 +70,6 @@ extern Environment env;
 
 //int readData(char * data);
 //bool updateThingSpeak(const char * data);
-const char AQI_LEVEL[6][9] = {"Good","Moderate", "Alert","Bad","VeryBad","Poison"};
+const char AQI_LEVEL[7][9] = {"Error","Good","Moderate", "Alert","Bad","VeryBad","Poison"};
 
 #endif
