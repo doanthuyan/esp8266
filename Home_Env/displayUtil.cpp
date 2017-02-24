@@ -21,6 +21,9 @@ void displayData(){
   dtostrf(env.humidity, 2, 0, humStr);
   dtostrf(env.temperature, 2, 0, tStr);
   dtostrf(env.aqi, 4, 0, aqiStr);
+  String tempStr = String (aqiStr);
+  tempStr.trim();
+  strcpy(aqiStr,tempStr.c_str());
   char line1[16];
   char line2[16];
   int n = sprintf(line1,"%s%cC Hum:%s%%",tStr,(char)223,humStr);

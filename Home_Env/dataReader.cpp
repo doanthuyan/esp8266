@@ -54,34 +54,49 @@ bool readData(){
   */
   return true;
 }
-void formatAAVNData(char * dataStr){
+void formatAAVNData(char * dataStr, char * snifferCode){
   StaticJsonBuffer<300> jsonBuffer;
 
   JsonObject& root = jsonBuffer.createObject();
 
   JsonObject& source = root.createNestedObject(SOURCE_KEY);
-  source[SOURCE_ID_KEY] = sender;
+  source[SOURCE_ID_KEY] = snifferCode;
   String macStr = WiFi.macAddress();
   macStr.replace(":","-");
   source[MAC_KEY] = macStr;
   source[GPS_KEY] = gps;
 
   JsonArray& data = root.createNestedArray(VALS_KEY);
+  if(env.humidity >= HUM_MIN && env.humidity <= HUM_MAX){
+    StaticJsonBuffer<150> buffer1;
+    JsonObject& obj1 = buffer1.createObject();
+    
+    obj1[CODE_KEY] = HUM_KEY;
+    obj1[SENSOR_KEY] = TEMP_SENSOR;
+    JsonObject& val1 = obj1.createNestedObject(VAL_KEY);
+    val1[VAL_KEY] = env.humidity;
+    data.add(obj1);
+  }else{
+    Serial.println("/*******************************/");
+    Serial.print("ERROR reading HUM: ");
+    Serial.println(env.humidity);
+    Serial.println("/*******************************/");
+  }
   
-  StaticJsonBuffer<150> buffer1;
-  JsonObject& obj1 = buffer1.createObject();
-  
-  obj1[CODE_KEY] = HUM_KEY;
-  obj1[SENSOR_KEY] = TEMP_SENSOR;
-  JsonObject& val1 = obj1.createNestedObject(VAL_KEY);
-  val1[VAL_KEY] = env.humidity;
-
-  StaticJsonBuffer<150> buffer2;
-  JsonObject& obj2 = buffer2.createObject();
-  obj2[CODE_KEY] = TEMP_KEY;
-  obj2[SENSOR_KEY] = TEMP_SENSOR;
-  JsonObject& val2 = obj2.createNestedObject(VAL_KEY);
-  val2[VAL_KEY] = env.temperature;
+  if(env.humidity >= TEMP_MIN && env.humidity <= TEMP_MAX){
+    StaticJsonBuffer<150> buffer2;
+    JsonObject& obj2 = buffer2.createObject();
+    obj2[CODE_KEY] = TEMP_KEY;
+    obj2[SENSOR_KEY] = TEMP_SENSOR;
+    JsonObject& val2 = obj2.createNestedObject(VAL_KEY);
+    val2[VAL_KEY] = env.temperature;
+    data.add(obj2);
+  }else{
+    Serial.println("/*******************************/");
+    Serial.print("ERROR reading TEMP: ");
+    Serial.println(env.temperature);
+    Serial.println("/*******************************/");
+  }
   
   /*Serial.println();
   obj1.prettyPrintTo(Serial);
@@ -89,8 +104,8 @@ void formatAAVNData(char * dataStr){
   obj2.prettyPrintTo(Serial);
   */
   
-  data.add(obj1);
-  data.add(obj2);
+  
+  
 
   Serial.println();
   String returnStr = "";

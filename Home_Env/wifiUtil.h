@@ -3,6 +3,7 @@
 void connectWiFi() ;
 bool updateThingSpeak();
 bool updateAAVN();
+bool updateAAVN_clone();
 void pushData();
 void getAqiData();
 #endif

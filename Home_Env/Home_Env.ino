@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 #include "DHT.h"

@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include "dataReader.h"
 WiFiClient client;
+WiFiClientSecure secureClient;
 void pushData(){
   // Attempt to connect to website
   Serial.println("\nAttempt to connect to website");
@@ -18,9 +19,11 @@ void pushData(){
   }
   
   if ( !updateAAVN() ) {
-    Serial.println("POST request failed");
+    Serial.println("POST sniffer-mind-it request failed");
   }
-  
+  if ( !updateAAVN_clone() ) {
+    Serial.println("POST sniffer-mind request failed");
+  }
 }
 // Attempt to connect to WiFi
 void connectWiFi() {
@@ -53,7 +56,7 @@ bool updateThingSpeak()
 
   // Attempt to make a connection to the remote server
   Serial.println("\nAttempt to make a connection to the remote server");
-  if ( !client.connect(thingSpeakAddress, serverPort) ) {
+  if ( !client.connect(thingSpeakAddress, httpPort) ) {
     return false;
   }
   
@@ -93,7 +96,7 @@ void getAqiData(){
   Serial.println("\nAttempt to connect to website");
   String response  = "";
   Serial.println("\nAttempt to read data from AQICN");
-  if ( !client.connect(aqiAddress, serverPort) ) {
+  if ( !client.connect(aqiAddress, httpPort) ) {
     Serial.println("Cannot connect AQI data");
     return;
   }
@@ -145,10 +148,10 @@ void getAqiData(){
 }
 bool updateAAVN()
 {
-  WiFiClient client;
+  //WiFiClient client;
   // Attempt to make a connection to the remote server
   Serial.println("\nAttempt to make a connection to the remote server");
-  if ( !client.connect(snifferAddress, serverPort) ) {
+  if ( !secureClient.connect(snifferAddress, httpsPort) ) {
     Serial.println("connection failed");
     return false;
   }
@@ -158,7 +161,7 @@ bool updateAAVN()
   //String url = "/sniffer-admin/api/packet";
   //String postData = "{\"source\": {\"senderCode\": \"143253\",\"netAddress\": \"192.168.1.1\"},\"data\": [{\"symbolCode\": \"O3\",\"value\": 4.1}, {\"symbolCode\": \"PM2.5\",\"value\": 55}]}";
   char data[500];
-  formatAAVNData(data);
+  formatAAVNData(data,sender);
   Serial.print("Data: ");
   Serial.println(data);
   
@@ -178,18 +181,18 @@ bool updateAAVN()
   Serial.println();
   Serial.println(data);
   // This will send the request to the server
-  client.print("POST ");
-  client.print(snifferUrl);
-  client.println(" HTTP/1.0");
-  client.print("Host: ");
-  client.println(snifferAddress);
-  client.println("Accept: */*");
-  client.println("Cache-Control: no-cache");
-  client.println("Content-Type: application/json");
-  client.print("Content-Length: ");
-  client.println(strlen(data));
-  client.println();
-  client.println(data);
+  secureClient.print("POST ");
+  secureClient.print(snifferUrl);
+  secureClient.println(" HTTP/1.0");
+  secureClient.print("Host: ");
+  secureClient.println(snifferAddress);
+  secureClient.println("Accept: */*");
+  secureClient.println("Cache-Control: no-cache");
+  secureClient.println("Content-Type: application/json");
+  secureClient.print("Content-Length: ");
+  secureClient.println(strlen(data));
+  secureClient.println();
+  secureClient.println(data);
   //client.println("Connection: close");
   //client.println();
   delay(100);
@@ -198,8 +201,71 @@ bool updateAAVN()
   Serial.println("\n---------------------------------------------------------------------\n");
   Serial.println("RESponse: \n" );
 
-  while ( client.available() ) {
-    char c = client.read();
+  while ( secureClient.available() ) {
+    char c = secureClient.read();
+    Serial.print(c);
+  }
+  Serial.println("\n---------------------------------------------------------------------\n");
+  return true;
+
+}
+bool updateAAVN_clone()
+{
+  //WiFiClient client;
+  // Attempt to make a connection to the remote server
+  Serial.println("\nAttempt to make a connection to the remote server");
+  if ( !secureClient.connect(snifferAddress, httpsPort) ) {
+    Serial.println("connection failed");
+    return false;
+  }
+  Serial.println("\n---------------------------------------------------------------------\n");
+  Serial.println("REQUEST: \n" );
+  // We now create a URI for the request
+  //String url = "/sniffer-admin/api/packet";
+  //String postData = "{\"source\": {\"senderCode\": \"143253\",\"netAddress\": \"192.168.1.1\"},\"data\": [{\"symbolCode\": \"O3\",\"value\": 4.1}, {\"symbolCode\": \"PM2.5\",\"value\": 55}]}";
+  char data[500];
+  formatAAVNData(data,sender_clone);
+  Serial.print("Data: ");
+  Serial.println(data);
+  
+  Serial.print("\n\nRequesting URL: ");
+  Serial.println(snifferUrl_clone);
+  Serial.println("\n---------------------------------------------------------------------\n");
+  Serial.print("POST ");
+  Serial.print(snifferUrl_clone);
+  Serial.println(" HTTP/1.0");
+  Serial.print("Host: ");
+  Serial.println(snifferAddress);
+  Serial.println("Accept: */*");
+  Serial.println("Cache-Control: no-cache");
+  Serial.println("Content-Type: application/json");
+  Serial.print("Content-Length: ");
+  Serial.println(strlen(data));
+  Serial.println();
+  Serial.println(data);
+  // This will send the request to the server
+  secureClient.print("POST ");
+  secureClient.print(snifferUrl_clone);
+  secureClient.println(" HTTP/1.0");
+  secureClient.print("Host: ");
+  secureClient.println(snifferAddress);
+  secureClient.println("Accept: */*");
+  secureClient.println("Cache-Control: no-cache");
+  secureClient.println("Content-Type: application/json");
+  secureClient.print("Content-Length: ");
+  secureClient.println(strlen(data));
+  secureClient.println();
+  secureClient.println(data);
+  //client.println("Connection: close");
+  //client.println();
+  delay(100);
+   delay (5000);
+  // If there are incoming bytes, print them
+  Serial.println("\n---------------------------------------------------------------------\n");
+  Serial.println("RESponse: \n" );
+
+  while ( secureClient.available() ) {
+    char c = secureClient.read();
     Serial.print(c);
   }
   Serial.println("\n---------------------------------------------------------------------\n");

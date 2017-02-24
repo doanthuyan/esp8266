@@ -4,6 +4,7 @@
 #include <LiquidCrystal_I2C.h>
 #include "DHT.h"
 #include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 
 #define SOURCE_KEY "source"
 #define SOURCE_ID_KEY "sourceId"
@@ -23,11 +24,17 @@
 #define HUM_KEY "HUM"
 #define TEMP_KEY "TEMP"
 
+#define TEMP_MAX 125
+#define TEMP_MIN -40
+#define HUM_MAX 100
+#define HUM_MIN 0
+
 
 #define thingSpeakAddress "api.thingspeak.com"
 #define writeAPIKey  "7U61IICUDWDO0TGV"
 #define updateInterval  30 * 1000      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
-#define serverPort 80
+#define httpPort 80
+#define httpsPort 443
 
 #define aqiAddress "api.waqi.info"
 #define aqiToken "d529395274dba5229ec9b822098f340a658b2a75"
@@ -35,15 +42,18 @@
 
 #define snifferAddress "iot.axonactive.vn"
 #define snifferUrl "/sniffer-mind-it/api/pollutantvalues"
-#define sender "yhlrpJwCIm"
+#define sender "9sTwEkrvhe"
+
+#define snifferUrl_clone "/sniffer-mind/api/pollutantvalues"
+#define sender_clone "ATHPZr34uk"
 
 #define gps "10.831233, 106.635495"
 
-#define TEMP_SENSOR "DHT11"
+#define TEMP_SENSOR "DHT22"
 
 
-#define WIFI_SSID       ""           // cannot be longer than 32 characters!
-#define WIFI_PASS       ""
+#define WIFI_SSID       "anonymous"           // cannot be longer than 32 characters!
+#define WIFI_PASS       "anhtu4x4"
 
 #define SEND_INTERVAL 15*60*1000
 
@@ -66,6 +76,7 @@ struct Environment{
 extern DHT dht;
 extern LiquidCrystal_I2C lcd;
 extern WiFiClient client;
+extern WiFiClientSecure secureClient;
 extern Environment env;
 
 //int readData(char * data);
