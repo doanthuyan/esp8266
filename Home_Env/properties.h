@@ -78,9 +78,15 @@ extern LiquidCrystal_I2C lcd;
 extern WiFiClient client;
 extern WiFiClientSecure secureClient;
 extern Environment env;
+extern bool wifiStatus;
 
 //int readData(char * data);
 //bool updateThingSpeak(const char * data);
 const char AQI_LEVEL[7][9] = {"Error","Good","Moderate", "Alert","Bad","VeryBad","Poison"};
+#define TEMP_MAX 125
+#define TEMP_MIN 0
+#define HUM_MAX 100
+#define HUM_MIN 0
 
+#define MAX_TRY 50
 #endif
