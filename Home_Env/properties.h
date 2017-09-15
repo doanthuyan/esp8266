@@ -10,6 +10,8 @@
 #define SOURCE_ID_KEY "sourceId"
 #define MAC_KEY "macAddress"
 #define GPS_KEY "gpsLocation"
+#define LONG_KEY "longitude"
+#define LAT_KEY "latitude"
 
 #define VALS_KEY "values"
 #define VAL_KEY "value"
@@ -24,10 +26,7 @@
 #define HUM_KEY "HUM"
 #define TEMP_KEY "TEMP"
 
-#define TEMP_MAX 125
-#define TEMP_MIN -40
-#define HUM_MAX 100
-#define HUM_MIN 0
+
 
 
 #define thingSpeakAddress "api.thingspeak.com"
@@ -40,20 +39,26 @@
 #define aqiToken "d529395274dba5229ec9b822098f340a658b2a75"
 #define aqiStationId "@8767"
 
-#define snifferAddress "iot.axonactive.vn"
-#define snifferUrl "/sniffer-mind-it/api/pollutantvalues"
+#define snifferAddress "sniffer.axonactive.com"
+#define snifferUrl "/api/pollutantvalues"
 #define sender "9sTwEkrvhe"
 
+#define snifferAddress_clone "iot.axonactive.vn"
 #define snifferUrl_clone "/sniffer-mind/api/pollutantvalues"
-#define sender_clone "ATHPZr34uk"
+#define sender_clone "143262"
 
-#define gps "10.831233, 106.635495"
+#define longitude "10.831233"
+#define latitude "106.635495"
 
 #define TEMP_SENSOR "DHT22"
 
 
 #define WIFI_SSID       "anonymous"           // cannot be longer than 32 characters!
 #define WIFI_PASS       "anhtu4x4"
+
+//#define WIFI_SSID       "IoT"           // cannot be longer than 32 characters!
+//#define WIFI_PASS       "IoT@@@VN1@3"
+
 
 #define SEND_INTERVAL 15*60*1000
 

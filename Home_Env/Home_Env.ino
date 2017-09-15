@@ -15,8 +15,14 @@ LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x3f for a 16 chars
 // Global variables
 
 Environment env;
-
-
+bool wifiStatus = false;
+void showWifiStatus(){
+  if(wifiStatus){
+    digitalWrite(WIFI_ERR_PIN, LOW);
+  }else{
+    digitalWrite(WIFI_ERR_PIN, HIGH);
+  }
+}
 void setup() {
   
   
@@ -24,6 +30,7 @@ void setup() {
   // Set up serial console to read web page
   Serial.begin(115200);
   Serial.println("Environment monitor");
+  
   initDisplay();
   // Set up LED for debugging
   pinMode(WIFI_ERR_PIN, OUTPUT);
@@ -31,17 +38,28 @@ void setup() {
   dht.begin();
   
   // Connect to WiFi
-  connectWiFi();
+  //connectWiFi();
   
   
 }
 
 void loop() {
-  getAqiData();
-  pushData();
+  
+  if(!readData()){
+    Serial.println("\n*** Error reading sensor ***");
+    //return;
+  }
   displayData();
+  connectWiFi();
+  showWifiStatus();
+  if(wifiStatus){   
+    //getAqiData();
+    pushData();
+    WiFi.disconnect();
+  }
+  
 
-  delay (500);
+  //delay (500);
   
   //bailout:Serial.println("Terminate loop");
   // go to deepsleep for 10 minutes

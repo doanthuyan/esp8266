@@ -54,8 +54,8 @@ bool readData(){
   */
   return true;
 }
-void formatAAVNData(char * dataStr, char * snifferCode){
-  StaticJsonBuffer<300> jsonBuffer;
+void formatAAVNData(char * dataStr,char * snifferCode){
+  StaticJsonBuffer<500> jsonBuffer;
 
   JsonObject& root = jsonBuffer.createObject();
 
@@ -64,39 +64,40 @@ void formatAAVNData(char * dataStr, char * snifferCode){
   String macStr = WiFi.macAddress();
   macStr.replace(":","-");
   source[MAC_KEY] = macStr;
-  source[GPS_KEY] = gps;
+
+  JsonObject& gps = source.createNestedObject(GPS_KEY);
+  gps[LONG_KEY] = longitude;
+  gps[LAT_KEY] = latitude;
 
   JsonArray& data = root.createNestedArray(VALS_KEY);
-  if(env.humidity >= HUM_MIN && env.humidity <= HUM_MAX){
-    StaticJsonBuffer<150> buffer1;
-    JsonObject& obj1 = buffer1.createObject();
+  StaticJsonBuffer<150> buffer1;
+  JsonObject& obj1 = buffer1.createObject();
+
+  if(env.humidity<= 100.0 && env.humidity>= 0.0){
     
     obj1[CODE_KEY] = HUM_KEY;
     obj1[SENSOR_KEY] = TEMP_SENSOR;
     JsonObject& val1 = obj1.createNestedObject(VAL_KEY);
     val1[VAL_KEY] = env.humidity;
-    data.add(obj1);
+    
   }else{
-    Serial.println("/*******************************/");
-    Serial.print("ERROR reading HUM: ");
+    Serial.println("**** ERROR: reading HUM ***");
     Serial.println(env.humidity);
-    Serial.println("/*******************************/");
   }
   
-  if(env.humidity >= TEMP_MIN && env.humidity <= TEMP_MAX){
-    StaticJsonBuffer<150> buffer2;
-    JsonObject& obj2 = buffer2.createObject();
+  StaticJsonBuffer<150> buffer2;
+  JsonObject& obj2 = buffer2.createObject();
+
+  //if(env.temperature <= 125 && env.temperature >= -40){
     obj2[CODE_KEY] = TEMP_KEY;
     obj2[SENSOR_KEY] = TEMP_SENSOR;
     JsonObject& val2 = obj2.createNestedObject(VAL_KEY);
     val2[VAL_KEY] = env.temperature;
-    data.add(obj2);
-  }else{
-    Serial.println("/*******************************/");
-    Serial.print("ERROR reading TEMP: ");
-    Serial.println(env.temperature);
-    Serial.println("/*******************************/");
-  }
+    
+  //}else{
+  //  Serial.println("**** ERROR: reading TEMP ***");
+  //  Serial.println(env.temperature);
+  //}
   
   /*Serial.println();
   obj1.prettyPrintTo(Serial);
@@ -104,8 +105,8 @@ void formatAAVNData(char * dataStr, char * snifferCode){
   obj2.prettyPrintTo(Serial);
   */
   
-  
-  
+  data.add(obj1);
+  data.add(obj2);
 
   Serial.println();
   String returnStr = "";

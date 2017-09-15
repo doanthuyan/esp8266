@@ -3,31 +3,30 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 #include "dataReader.h"
-WiFiClient client;
-WiFiClientSecure secureClient;
+
+
 void pushData(){
   // Attempt to connect to website
   Serial.println("\nAttempt to connect to website");
   //data = "&field1=10";
+
   
-  if(!readData()){
-    Serial.println("\n*** Error reading sensor ***");
-    return;
-  }
+  
   if ( !updateThingSpeak() ) {
     Serial.println("GET request failed");
   }
   
   if ( !updateAAVN() ) {
-    Serial.println("POST sniffer-mind-it request failed");
+    Serial.println("POST sniffer request failed");
   }
-  if ( !updateAAVN_clone() ) {
+  /*if ( !updateAAVN_clone() ) {
     Serial.println("POST sniffer-mind request failed");
-  }
+  }*/
 }
 // Attempt to connect to WiFi
 void connectWiFi() {
-  Serial.println("connecting WiFi");
+  Serial.println("\nconnecting WiFi");
+  
   byte led_status = 0;
   
   // Set WiFi mode to station (client)
@@ -37,20 +36,30 @@ void connectWiFi() {
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   
   // Blink LED while we wait for WiFi connection
-  while ( WiFi.status() != WL_CONNECTED ) {
+  int count = 0;
+  while ( WiFi.status() != WL_CONNECTED && count < MAX_TRY) {
     digitalWrite(WIFI_ERR_PIN, led_status);
     led_status ^= 0x01;
-    delay(100);
+    delay(500);
+    count ++;
   }
-  lcd.setCursor(0,1);
-  lcd.print("Wifi connected!");
+  if(WiFi.status() == WL_CONNECTED){
+    wifiStatus = true;
+    Serial.println("Wifi connected");
+  }else{
+    wifiStatus = false;
+    Serial.println("Wifi fail");
+  }
+  //lcd.setCursor(0,1);
+  //lcd.print("Wifi connected!");
   // Turn LED off when we are connected
   digitalWrite(WIFI_ERR_PIN, LOW);
 }
 
 bool updateThingSpeak()
 {
-    char data[100];
+  WiFiClient client;
+  char data[100];
   //int n = readData(data);//sprintf(data,"%s","&field1=1&field2=3&field3=2");
   formatThingspeakData(data);
 
@@ -89,10 +98,12 @@ bool updateThingSpeak()
     Serial.print(c);
   }
   Serial.println("\n---------------------------------------------------------------------\n");
+  client.stop();
   return true;
 
 }
 void getAqiData(){
+  WiFiClient client;
   Serial.println("\nAttempt to connect to website");
   String response  = "";
   Serial.println("\nAttempt to read data from AQICN");
@@ -122,6 +133,7 @@ void getAqiData(){
     response.concat(c);
     Serial.print(c);
   }
+  client.stop();
   Serial.println();
   int index = response.indexOf('{');
   response = response.substring(index);
@@ -148,6 +160,7 @@ void getAqiData(){
 }
 bool updateAAVN()
 {
+  WiFiClientSecure secureClient;
   //WiFiClient client;
   // Attempt to make a connection to the remote server
   Serial.println("\nAttempt to make a connection to the remote server");
@@ -168,53 +181,54 @@ bool updateAAVN()
   Serial.print("\n\nRequesting URL: ");
   Serial.println(snifferUrl);
   Serial.println("\n---------------------------------------------------------------------\n");
-  Serial.print("POST ");
-  Serial.print(snifferUrl);
-  Serial.println(" HTTP/1.0");
-  Serial.print("Host: ");
-  Serial.println(snifferAddress);
-  Serial.println("Accept: */*");
-  Serial.println("Cache-Control: no-cache");
-  Serial.println("Content-Type: application/json");
-  Serial.print("Content-Length: ");
-  Serial.println(strlen(data));
-  Serial.println();
-  Serial.println(data);
+  String len = String(strlen(data));
+  String requestStr = String("POST ") + snifferUrl + " HTTP/1.1\r\n" +
+               "Host: " + snifferAddress + "\r\n" +
+               "User-Agent: SnifferHub\r\n" +
+               "Content-Length: " + len +"\r\n"+
+               "Content-Type: application/json\r\n"+
+               "Connection: close\r\n"+
+               "\r\n"+
+               data+
+               "\r\n";
+  Serial.println(requestStr);
   // This will send the request to the server
-  secureClient.print("POST ");
-  secureClient.print(snifferUrl);
-  secureClient.println(" HTTP/1.0");
-  secureClient.print("Host: ");
-  secureClient.println(snifferAddress);
-  secureClient.println("Accept: */*");
-  secureClient.println("Cache-Control: no-cache");
-  secureClient.println("Content-Type: application/json");
-  secureClient.print("Content-Length: ");
-  secureClient.println(strlen(data));
-  secureClient.println();
-  secureClient.println(data);
-  //client.println("Connection: close");
-  //client.println();
-  delay(100);
-   delay (5000);
+  secureClient.print(requestStr);
+  
   // If there are incoming bytes, print them
-  Serial.println("\n---------------------------------------------------------------------\n");
-  Serial.println("RESponse: \n" );
-
+  Serial.println("\n\n---------------------------------------------------------------------\n");
+  Serial.println("RESPONSE: \n" );
+  // Read all the lines of the reply from server and print them to Serial
+  int waitcount = 0;
+  while (!secureClient.available() && waitcount++ < 300) {
+      Serial.println(".");
+       delay(10);
+  }
+  
+  int count = 0;
   while ( secureClient.available() ) {
     char c = secureClient.read();
     Serial.print(c);
+    count++;
   }
-  Serial.println("\n---------------------------------------------------------------------\n");
-  return true;
+  if(count >0){
+    return true;
+  }else{
+    return false;
+  }
+
+  
+
+
 
 }
 bool updateAAVN_clone()
 {
+  WiFiClientSecure secureClient;
   //WiFiClient client;
   // Attempt to make a connection to the remote server
   Serial.println("\nAttempt to make a connection to the remote server");
-  if ( !secureClient.connect(snifferAddress, httpsPort) ) {
+  if ( !secureClient.connect(snifferAddress_clone, httpsPort) ) {
     Serial.println("connection failed");
     return false;
   }
@@ -235,7 +249,7 @@ bool updateAAVN_clone()
   Serial.print(snifferUrl_clone);
   Serial.println(" HTTP/1.0");
   Serial.print("Host: ");
-  Serial.println(snifferAddress);
+  Serial.println(snifferAddress_clone);
   Serial.println("Accept: */*");
   Serial.println("Cache-Control: no-cache");
   Serial.println("Content-Type: application/json");
@@ -248,7 +262,7 @@ bool updateAAVN_clone()
   secureClient.print(snifferUrl_clone);
   secureClient.println(" HTTP/1.0");
   secureClient.print("Host: ");
-  secureClient.println(snifferAddress);
+  secureClient.println(snifferAddress_clone);
   secureClient.println("Accept: */*");
   secureClient.println("Cache-Control: no-cache");
   secureClient.println("Content-Type: application/json");
