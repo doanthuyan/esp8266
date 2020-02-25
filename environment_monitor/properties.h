@@ -4,12 +4,10 @@
 #include <dht.h>
 
 #define thingSpeakAddress "api.thingspeak.com"
-#define writeAPIKey  "7X8TBTEOMUESVGPQ"
+#define writeAPIKey  ""
 #define updateInterval  30 * 1000      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
 #define serverPort 80
 
-#define WIFI_SSID       "IoT"           // cannot be longer than 32 characters!
-#define WIFI_PASS       "IoT@AAVN"
 
 #define SEND_INTERVAL 15*60*1000
 

@@ -30,18 +30,18 @@
 
 
 #define thingSpeakAddress "api.thingspeak.com"
-#define writeAPIKey  "7U61IICUDWDO0TGV"
+#define writeAPIKey  ""
 #define updateInterval  30 * 1000      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
 #define httpPort 80
 #define httpsPort 443
 
 #define aqiAddress "api.waqi.info"
-#define aqiToken "d529395274dba5229ec9b822098f340a658b2a75"
+#define aqiToken ""
 #define aqiStationId "@8767"
 
 #define snifferAddress "sniffer.axonactive.com"
 #define snifferUrl "/api/pollutantvalues"
-#define sender "9sTwEkrvhe"
+#define sender ""
 
 #define snifferAddress_clone "iot.axonactive.vn"
 #define snifferUrl_clone "/sniffer-mind/api/pollutantvalues"
@@ -51,13 +51,6 @@
 #define latitude "106.635495"
 
 #define TEMP_SENSOR "DHT22"
-
-
-#define WIFI_SSID       "anonymous"           // cannot be longer than 32 characters!
-#define WIFI_PASS       "anhtu4x4"
-
-//#define WIFI_SSID       "IoT"           // cannot be longer than 32 characters!
-//#define WIFI_PASS       "IoT@@@VN1@3"
 
 
 #define SEND_INTERVAL 15*60*1000
